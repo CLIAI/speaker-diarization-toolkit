@@ -1,0 +1,26 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║           Speaker Mapper Benchmark Results                              ║
+║  LLM Args: --llm-detect smollm2:360m --llm-endpoint http://localhost:11434/v1║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+TEST                         STATUS    ACCURACY  TIME    DETAILS
+────────────────────────────────────────────────────────────────────────────
+001-clear-introductions      ⚠ ERROR     0.0%   60.1s  Timeout (>60s)
+002-informal-names           ⚠ ERROR     0.0%   22.4s  Exit code 1: ERROR: LLM detection failed
+003-three-speakers           ⚠ ERROR     0.0%   60.1s  Timeout (>60s)
+004-no-names-mentioned       ⚠ ERROR     0.0%   32.4s  Exit code 1: ERROR: LLM detection failed
+005-partial-names            ⚠ ERROR     0.0%   13.4s  Exit code 1: ERROR: LLM detection failed
+006-ambiguous-context        ⚠ ERROR     0.0%   34.1s  Exit code 1: ERROR: LLM detection failed
+007-four-speakers            ⚠ ERROR     0.0%   60.1s  Timeout (>60s)
+────────────────────────────────────────────────────────────────────────────
+
+SUMMARY
+════════════════════════════════════════════════════════════════════════════
+  Total Tests:      7
+  Passed:           0 (0.0%)
+  Failed:           0 (0.0%)
+  Errors:           7
+  Avg Accuracy:     0.0%
+  Avg Time:         40.37s
+  Total Time:       282.59s
+════════════════════════════════════════════════════════════════════════════

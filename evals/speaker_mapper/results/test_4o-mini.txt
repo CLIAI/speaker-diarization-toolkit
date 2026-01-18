@@ -1,0 +1,21 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║           Speaker Mapper Benchmark Results                              ║
+║  LLM Args: --llm-detect 4o-mini                                      ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+TEST                         STATUS    ACCURACY  TIME    DETAILS
+────────────────────────────────────────────────────────────────────────────
+001-clear-introductions      ✓ PASS    100.0%    7.9s  A→Sarah Johnson✓, B→David Lee✓
+002-informal-names           ✓ PASS    100.0%    8.1s  A→Michael Thompson✓, B→Elizabeth Wilson✓
+003-three-speakers           ✓ PASS    100.0%    7.3s  A→Jennifer Martinez✓, B→Robert Chen✓, C→Amy Parker✓
+────────────────────────────────────────────────────────────────────────────
+
+SUMMARY
+════════════════════════════════════════════════════════════════════════════
+  Total Tests:      3
+  Passed:           3 (100.0%)
+  Failed:           0 (0.0%)
+  Avg Accuracy:     100.0%
+  Avg Time:         7.80s
+  Total Time:       23.39s
+════════════════════════════════════════════════════════════════════════════

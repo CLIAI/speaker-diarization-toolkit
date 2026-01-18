@@ -1,0 +1,26 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║           Speaker Mapper Benchmark Results                              ║
+║  LLM Args: --llm-detect nemotron-mini --llm-endpoint http://localhost:11434/v1║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+TEST                         STATUS    ACCURACY  TIME    DETAILS
+────────────────────────────────────────────────────────────────────────────
+001-clear-introductions      ⚠ ERROR     0.0%   30.6s  Exit code 1: ERROR: LLM detection failed
+002-informal-names           ✗ FAIL     50.0%   25.0s  A→~, B→~
+003-three-speakers           ✗ FAIL     66.7%   48.0s  A→Unknown✗, B→Robert Chen✓, C→Amy Parker✓
+004-no-names-mentioned       ⚠ ERROR     0.0%   45.9s  Exit code 1: ERROR: LLM detection failed
+005-partial-names            ✗ FAIL      0.0%   34.4s  A→Alice Anderson✗, B→Bob Martinez✗
+006-ambiguous-context        ✗ FAIL     50.0%   34.5s  A→Alice Anderson~, B→Bob Martinez~
+007-four-speakers            ⚠ ERROR     0.0%   60.1s  Timeout (>60s)
+────────────────────────────────────────────────────────────────────────────
+
+SUMMARY
+════════════════════════════════════════════════════════════════════════════
+  Total Tests:      7
+  Passed:           0 (0.0%)
+  Failed:           4 (57.1%)
+  Errors:           3
+  Avg Accuracy:     41.7%
+  Avg Time:         39.78s
+  Total Time:       278.49s
+════════════════════════════════════════════════════════════════════════════
