@@ -1039,17 +1039,47 @@ def cmd_identify(args) -> int:
         return 1
 
     if not results:
-        print("No matching speakers found.")
+        if getattr(args, 'format', 'text') == 'json':
+            print("[]")
+        else:
+            print("No matching speakers found.")
         return 0
 
-    # Display results
-    print("\nMatches:")
+    # Build output data with trust levels
+    output_data = []
     for r in results:
         speaker_id = r["speaker_id"]
         profile = load_speaker(speaker_id)
         name = profile["names"]["default"] if profile else speaker_id
         confidence = r.get("confidence", r.get("similarity", 0))
-        print(f"  {speaker_id}: {name} (confidence: {confidence:.2f})")
+
+        # Get embedding details for trust level
+        embedding_id = r.get("embedding_id")
+        trust_level = "unknown"
+        if profile and embedding_id:
+            embeddings = profile.get("embeddings", {}).get(backend_name, [])
+            for emb in embeddings:
+                if emb.get("id") == embedding_id:
+                    trust_level = emb.get("trust_level", "unknown")
+                    break
+
+        output_data.append({
+            "speaker_id": speaker_id,
+            "name": name,
+            "score": confidence,
+            "confidence": confidence,
+            "trust_level": trust_level,
+            "embedding_id": embedding_id,
+            "backend": backend_name,
+        })
+
+    # Output based on format
+    if getattr(args, 'format', 'text') == 'json':
+        print(json.dumps(output_data, indent=2))
+    else:
+        print("\nMatches:")
+        for item in output_data:
+            print(f"  {item['speaker_id']}: {item['name']} (confidence: {item['score']:.2f})")
 
     return 0
 
@@ -1411,6 +1441,8 @@ def main():
     identify_parser.add_argument("--tags", help="Filter candidates by tags (comma-separated)")
     identify_parser.add_argument("--threshold", type=float, default=0.354,
                                  help="Similarity threshold (default: 0.354)")
+    identify_parser.add_argument("--format", "-f", choices=["text", "json"], default="text",
+                                 help="Output format (default: text)")
     identify_parser.set_defaults(func=cmd_identify)
 
     # verify command
