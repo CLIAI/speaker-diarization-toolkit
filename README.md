@@ -137,6 +137,10 @@ Currently supports:
 * **Speechmatics** - Primary STT backend with diarization
 * **AssemblyAI** - Alternative transcript format support
 
+## Related Projects
+
+* [stt-in-batch](https://github.com/shibuido/stt-in-batch) - Batch speech-to-text pipeline that integrates with speaker-diarization-toolkit for end-to-end transcription with speaker identification
+
 ## License
 
 MIT License - See LICENSE file for details.
