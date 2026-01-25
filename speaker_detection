@@ -362,7 +362,7 @@ def compute_trust_level(samples: Dict[str, List[str]]) -> str:
 
     - HIGH: All samples reviewed, none rejected
     - MEDIUM: Mix of reviewed + unreviewed, none rejected
-    - LOW: All samples unreviewed
+    - LOW: All samples unreviewed, or no samples at all
     - INVALIDATED: Any sample rejected
     """
     reviewed = samples.get("reviewed", [])
@@ -375,9 +375,8 @@ def compute_trust_level(samples: Dict[str, List[str]]) -> str:
         return "high"
     if reviewed:
         return "medium"
-    if unreviewed:
-        return "low"
-    return "unknown"  # No samples at all
+    # No samples or only unreviewed samples → low trust
+    return "low"
 
 
 # ----------------------------------------------------------------------
@@ -881,8 +880,11 @@ def cmd_enroll(args) -> int:
     # Get sample hashes from speaker_samples storage (if any)
     samples_by_status = get_samples_by_source_audio(speaker_id, audio_b3sum)
 
-    # Compute trust level
-    trust_level = compute_trust_level(samples_by_status)
+    # Compute trust level (use CLI override if provided)
+    if getattr(args, 'trust_level', None):
+        trust_level = args.trust_level
+    else:
+        trust_level = compute_trust_level(samples_by_status)
 
     # Build embedding record
     embedding_record = {
@@ -990,6 +992,39 @@ def cmd_remove_embedding(args) -> int:
 
     save_speaker(profile)
     print(f"Removed embedding {emb_id} from speaker '{speaker_id}'")
+    return 0
+
+
+def cmd_update_embedding(args) -> int:
+    """Update properties of an existing embedding."""
+    speaker_id = normalize_speaker_id(args.id)
+    profile = load_speaker(speaker_id)
+
+    if not profile:
+        print(f"Error: Speaker '{speaker_id}' not found.", file=sys.stderr)
+        return 1
+
+    emb_id = args.embedding_id
+    found = False
+
+    for backend_name, embeddings in profile.get("embeddings", {}).items():
+        for emb in embeddings:
+            if emb.get("id") == emb_id:
+                # Update trust level if provided
+                if args.trust_level:
+                    old_trust = emb.get("trust_level", "unknown")
+                    emb["trust_level"] = args.trust_level
+                    print(f"Updated embedding {emb_id}: trust_level {old_trust} -> {args.trust_level}")
+                found = True
+                break
+        if found:
+            break
+
+    if not found:
+        print(f"Error: Embedding '{emb_id}' not found for speaker '{speaker_id}'.", file=sys.stderr)
+        return 1
+
+    save_speaker(profile)
     return 0
 
 
@@ -1418,6 +1453,8 @@ def main():
                                help="Read segments from stdin (JSONL format from speaker_samples segments)")
     enroll_parser.add_argument("-n", "--dry-run", action="store_true",
                                help="Show what would be enrolled without making API calls")
+    enroll_parser.add_argument("--trust-level", choices=["high", "medium", "low"],
+                               help="Override trust level (default: computed from samples, or 'low' if none)")
     enroll_parser.set_defaults(func=cmd_enroll)
 
     # embeddings command
@@ -1433,6 +1470,14 @@ def main():
     rem_emb_parser.add_argument("id", help="Speaker ID")
     rem_emb_parser.add_argument("embedding_id", help="Embedding ID to remove")
     rem_emb_parser.set_defaults(func=cmd_remove_embedding)
+
+    # update-embedding command
+    upd_emb_parser = subparsers.add_parser("update-embedding", help="Update embedding properties")
+    upd_emb_parser.add_argument("id", help="Speaker ID")
+    upd_emb_parser.add_argument("embedding_id", help="Embedding ID to update")
+    upd_emb_parser.add_argument("--trust-level", choices=["high", "medium", "low"],
+                                help="Set trust level")
+    upd_emb_parser.set_defaults(func=cmd_update_embedding)
 
     # identify command
     identify_parser = subparsers.add_parser("identify", help="Identify speaker in audio")
