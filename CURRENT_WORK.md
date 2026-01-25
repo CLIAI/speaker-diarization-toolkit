@@ -185,3 +185,15 @@ export SPEAKER_DETECTION_DEBUG="1"               # verbose logging
 * Documented target workflow for audio processing
 * Identified gap: STT wrapper scripts live externally
 * Created this tracking file
+
+### 2026-01-25
+
+* Fixed Issue #2: Added `--format json` to `speaker_detection identify`
+  - Enables `speaker-assign --use-embeddings` to work correctly
+  - JSON output includes speaker_id, score, trust_level, embedding_id, backend
+* Fixed Issue #3: Added trust level management
+  - `--trust-level` option on `enroll` command
+  - Default changed from "unknown" to "low" when no samples
+  - New `update-embedding` command for post-enrollment updates
+* Fixed Issue #1: Added Related Projects section to README
+  - Cross-reference to stt-in-batch for end-to-end workflow
