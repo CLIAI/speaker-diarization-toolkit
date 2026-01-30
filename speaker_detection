@@ -1091,12 +1091,26 @@ def cmd_identify(args) -> int:
         # Get embedding details for trust level
         embedding_id = r.get("embedding_id")
         trust_level = "unknown"
-        if profile and embedding_id:
+        if profile:
             embeddings = profile.get("embeddings", {}).get(backend_name, [])
-            for emb in embeddings:
-                if emb.get("id") == embedding_id:
-                    trust_level = emb.get("trust_level", "unknown")
-                    break
+            if embedding_id:
+                # Look up specific embedding if backend provided ID
+                for emb in embeddings:
+                    if emb.get("id") == embedding_id:
+                        trust_level = emb.get("trust_level", "unknown")
+                        break
+            elif embeddings:
+                # Backend didn't return embedding_id - use best trust level from all embeddings
+                trust_order = {"high": 3, "medium": 2, "low": 1, "unknown": 0, "invalidated": -1}
+                best_trust = "unknown"
+                best_emb_id = None
+                for emb in embeddings:
+                    emb_trust = emb.get("trust_level", "unknown")
+                    if trust_order.get(emb_trust, 0) > trust_order.get(best_trust, 0):
+                        best_trust = emb_trust
+                        best_emb_id = emb.get("id")
+                trust_level = best_trust
+                embedding_id = best_emb_id  # Use best embedding's ID
 
         output_data.append({
             "speaker_id": speaker_id,
